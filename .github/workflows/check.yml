@@ -1,0 +1,31 @@
+name: Check
+
+# Site estático puro, sem build step — não tem o que "compilar" quebrar.
+# Este check só confere se todo arquivo local referenciado em src=/href=
+# no index.html realmente existe no repo (pega link quebrado de css/js/
+# imagem antes de virar um 404 em produção).
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  arquivos-referenciados-existem:
+    name: Referências locais do index.html existem
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Conferir src=/href= locais
+        run: |
+          set -e
+          grep -oE '(src|href)="[^"#][^"]*"' index.html | sed -E 's/^(src|href)="//;s/"$//' | while IFS= read -r caminho; do
+            case "$caminho" in
+              http://*|https://*|mailto:*|tel:*|data:*) continue ;;
+            esac
+            if [ ! -f "$caminho" ]; then
+              echo "::error file=index.html::Referência local não encontrada: $caminho"
+              exit 1
+            fi
+          done
