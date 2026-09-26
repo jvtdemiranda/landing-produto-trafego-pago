@@ -10,12 +10,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-
 <!--
   Onde o Pixel do Meta entraria:
-  logo abaixo do <head>, ainda antes do </head>, vai o script padrão
+  aqui, antes do </head>, vai o script padrão
   gerado pelo Gerenciador de Eventos do Meta Business Suite. Ele injeta
   uma função global fbq(...) que a gente chama em dois momentos-chave
   desta página:
@@ -30,6 +27,8 @@
   no momento certo — é só colar o snippet oficial quando a conta de
   anúncio existir.
 -->
+</head>
+<body>
 
 <header class="site-header">
   <div class="wrap header-inner">
@@ -165,7 +164,7 @@
   <section class="oferta" id="oferta">
     <div class="wrap oferta-inner">
       <p class="oferta-label">Oferta da semana termina em</p>
-      <div class="countdown" id="countdown" aria-live="polite">
+      <div class="countdown" id="countdown">
         <div class="countdown-num"><span id="cd-dias">00</span><span class="countdown-lbl">dias</span></div>
         <div class="countdown-num"><span id="cd-horas">00</span><span class="countdown-lbl">horas</span></div>
         <div class="countdown-num"><span id="cd-min">00</span><span class="countdown-lbl">min</span></div>

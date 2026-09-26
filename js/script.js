@@ -35,7 +35,11 @@
       // sessionStorage (não localStorage): guarda só durante esta visita.
       // Se guardássemos pra sempre, um clique antigo "roubaria" o crédito
       // de uma compra que na verdade veio de outro anúncio dias depois.
-      sessionStorage.setItem("alara_utm", JSON.stringify(utm));
+      // try/catch: navegador com armazenamento bloqueado lança erro aqui,
+      // e sem isso o resto da página (links de compra, contador) parava.
+      try {
+        sessionStorage.setItem("alara_utm", JSON.stringify(utm));
+      } catch (e) {}
     }
 
     return temAlgum ? utm : lerUtmSalva();
@@ -101,16 +105,26 @@
   //
   // Um erro comum (e antiético) em página de tráfego pago é fazer o
   // contador reiniciar a cada visita, criando uma urgência falsa que
-  // nunca acaba de verdade. Aqui o prazo é fixo: sempre o próximo
-  // domingo às 23:59 — todo mundo que visita durante a mesma semana vê
-  // a mesma contagem, e ela realmente chega a zero.
+  // nunca acaba de verdade. Aqui o prazo é fixo: o próximo domingo às
+  // 23:59 no horário da loja (Belém, UTC-3, sem horário de verão) —
+  // calculado nesse fuso, não no do aparelho de quem visita; senão
+  // alguém no Acre ou em Portugal veria um prazo diferente.
+  //
+  // Numa campanha real, o prazo tem que ser a data de fim de verdade da
+  // promoção — um "oferta da semana" que recomeça toda segunda com o
+  // mesmo preço também é urgência falsa (ver README).
   // ---------------------------------------------------------------
+  var FUSO_LOJA_MS = -3 * 3600000;
+
   function proximoFimDeSemana() {
-    var agora = new Date();
-    var diasAteDomingo = (7 - agora.getDay()) % 7;
-    var alvo = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + diasAteDomingo, 23, 59, 59);
-    if (alvo <= agora) alvo.setDate(alvo.getDate() + 7);
-    return alvo;
+    var agora = Date.now();
+    // "relógio de Belém", lido com os métodos getUTC*
+    var relogioLoja = new Date(agora + FUSO_LOJA_MS);
+    var diasAteDomingo = (7 - relogioLoja.getUTCDay()) % 7;
+    var alvo = Date.UTC(relogioLoja.getUTCFullYear(), relogioLoja.getUTCMonth(),
+      relogioLoja.getUTCDate() + diasAteDomingo, 23, 59, 59) - FUSO_LOJA_MS;
+    if (alvo <= agora) alvo += 7 * 86400000;
+    return new Date(alvo);
   }
 
   function iniciarCountdown() {

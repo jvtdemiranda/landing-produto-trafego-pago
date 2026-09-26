@@ -84,8 +84,16 @@ landing-produto-trafego-pago/
 - **Contador regressivo com data fixa, não por visitante** — um erro
   comum (antiético) em página de tráfego pago é o contador reiniciar a
   cada visita, criando urgência falsa que nunca termina de verdade.
-  Aqui o prazo é sempre até o próximo domingo às 23h59 — igual pra
-  todo mundo que visita na mesma semana, e realmente chega a zero.
+  Aqui o prazo é sempre até o próximo domingo às 23h59 no horário da
+  loja (Belém) — igual pra todo mundo que visita na mesma semana, em
+  qualquer fuso, e realmente chega a zero.
+  **Ressalva pra uso real:** numa campanha de verdade, o prazo tem que
+  ser a data de fim real da promoção. Uma "oferta da semana" que
+  recomeça toda segunda com o mesmo preço também é urgência falsa, e o
+  preço "de" (R$ 189,90) precisa ter sido praticado de fato — anunciar
+  desconto sobre um preço que nunca existiu pode ser considerado
+  publicidade enganosa pelo Código de Defesa do Consumidor. Aqui o
+  contador semanal existe só pra demonstração funcionar em qualquer dia.
 - **UTM em `sessionStorage`, não `localStorage`** — guardar pra sempre
   faria um clique antigo "roubar" o crédito de uma compra que na
   verdade veio de outro anúncio dias depois.
@@ -105,6 +113,29 @@ landing-produto-trafego-pago/
    (WhatsApp), onde abrir em nova aba fazia sentido pra manter a
    página original aberta durante a conversa. Padronizado: os cinco
    agora navegam na mesma aba.
+3. **Contador com prazo diferente dependendo de onde a pessoa está** —
+   achado numa revisão depois de publicado. O "próximo domingo 23h59"
+   era calculado no fuso do aparelho de quem visita: em Belém o prazo
+   acabava num horário, no Acre 2h depois, em Portugal 4h antes, no
+   Japão 12h antes — contradizendo a promessa de "mesmo prazo pra todo
+   mundo". Agora é calculado sempre no horário da loja (UTC-3); testado
+   simulando 4 fusos diferentes, todos chegam ao mesmo instante.
+4. **Página "travava" com armazenamento bloqueado** — gravar a UTM no
+   `sessionStorage` não estava protegido contra erro. Em navegador que
+   bloqueia armazenamento (modo privado antigo do Safari, cookies
+   desativados), esse erro interrompia o script inteiro: os botões
+   "Comprar agora" ficavam sem o link do checkout e o contador parava
+   em zero — ou seja, a página perdia justamente a venda. Corrigido com
+   `try/catch`, reproduzido antes e depois da correção.
+5. **Contador lido em voz alta a cada segundo** — o contador tinha
+   `aria-live`, que faz leitores de tela (usados por pessoas com
+   deficiência visual) anunciarem cada mudança; como ele muda a cada
+   segundo, a página ficava inutilizável pra essas pessoas. Removido.
+
+> O link de checkout (`loja-alara.nuvemshop.com.br`) é fictício, como a
+> marca — clicar em "Comprar agora" na versão publicada leva a uma loja
+> que não existe. Numa entrega real, é só trocar a constante
+> `LINK_CHECKOUT_BASE` em `js/script.js` pelo link do produto na loja.
 
 ## Stack
 
